@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Office | Hi-Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+        colors: { primary: { DEFAULT: '#1a2e75', dark: '#13235a' }, secondary: { DEFAULT: '#425aad', soft: '#e8ecf8' } },
+      } },
+    };
+  </script>
+</head>
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 flex w-64 -translate-x-full flex-col bg-primary text-white transition-transform lg:translate-x-0">
+    <div class="flex items-center gap-3 px-6 py-6">
+      <span class="grid size-10 place-items-center rounded-xl bg-white text-primary"><iconify-icon icon="lucide:fingerprint" width="24" height="24"></iconify-icon></span>
+      <span class="text-lg font-extrabold">Hi-Connect</span>
+    </div>
+    <nav class="flex-1 space-y-1 px-3 text-sm font-medium" aria-label="Main">
+      <a href="dashboard.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:layout-dashboard" width="18"></iconify-icon>Analytics</a>
+      <a href="employees.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:users" width="18"></iconify-icon>Employees</a>
+      <a href="attendance.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:calendar-check" width="18"></iconify-icon>Attendance</a>
+      <a href="leave.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:calendar-off" width="18"></iconify-icon>Leave requests</a>
+      <details class="group" open>
+        <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2.5 text-white hover:bg-white/10 [&::-webkit-details-marker]:hidden"><iconify-icon icon="lucide:settings" width="18"></iconify-icon>Settings<iconify-icon icon="lucide:chevron-down" width="16" class="ml-auto transition-transform group-open:rotate-180"></iconify-icon></summary>
+        <div class="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
+          <a href="office.html" aria-current="page" class="flex items-center gap-3 rounded-lg bg-secondary px-3 py-2"><iconify-icon icon="lucide:building-2" width="16"></iconify-icon>Office</a>
+          <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:clock-3" width="16"></iconify-icon>Shift schedule</a>
+          <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:shield-check" width="16"></iconify-icon>Roles and access</a>
+        </div>
+      </details>
+    </nav>
+    <a href="login.html" class="m-3 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:log-out" width="18"></iconify-icon>Sign out</a>
+  </aside>
+  <div id="scrim" class="fixed inset-0 z-20 hidden bg-slate-900/40 lg:hidden"></div>
+
+  <div class="lg:pl-64">
+    <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-8">
+      <button id="menu-btn" class="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Open menu"><iconify-icon icon="lucide:menu" width="20"></iconify-icon></button>
+      <div class="ml-auto flex items-center gap-3">
+        <button class="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Notifications"><iconify-icon icon="lucide:bell" width="20"></iconify-icon></button>
+        <span class="grid size-9 place-items-center rounded-full bg-secondary-soft text-sm font-bold text-primary" aria-label="Signed in as HR admin">HR</span>
+      </div>
+    </header>
+
+    <main class="space-y-5 px-4 py-6 sm:px-8">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-extrabold text-primary">Office</h1>
+          <p class="text-sm text-slate-500">Company profile and the places where employees can check in.</p>
+        </div>
+        <button id="add-btn" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2">
+          <iconify-icon icon="lucide:plus" width="18"></iconify-icon>Add office
+        </button>
+      </div>
+
+      <!-- Main office profile -->
+      <section id="profile" class="rounded-xl border border-slate-200 bg-white p-5 sm:p-6" aria-label="Main office"></section>
+
+      <div class="relative max-w-sm">
+        <iconify-icon icon="lucide:search" width="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></iconify-icon>
+        <input id="q" type="search" placeholder="Search by name or address" aria-label="Search offices"
+          class="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+      </div>
+
+      <section class="rounded-xl border border-slate-200 bg-white">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[780px] text-left text-sm">
+            <thead class="border-b border-slate-200 text-xs text-slate-500">
+              <tr><th class="px-5 py-3 font-semibold">Office</th><th class="px-3 py-3 font-semibold">Address</th><th class="px-3 py-3 font-semibold">Branch</th><th class="px-3 py-3 font-semibold">Check-in area</th><th class="px-3 py-3 font-semibold">Website</th><th class="px-5 py-3 text-right font-semibold">Actions</th></tr>
+            </thead>
+            <tbody id="rows" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div id="empty" hidden class="px-5 py-14 text-center">
+          <iconify-icon icon="lucide:building-2" width="36" class="text-slate-300"></iconify-icon>
+          <p class="mt-2 font-semibold">No offices match your search</p>
+          <p class="text-sm text-slate-500">Try a different name or address, or add a new office.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add / edit dialog -->
+  <dialog id="off-dialog" class="max-h-[92vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/40">
+    <form id="off-form" method="dialog" novalidate class="p-6">
+      <div class="flex items-start justify-between">
+        <h2 id="dialog-title" class="text-lg font-bold text-primary">Add office</h2>
+        <button type="button" data-close class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Close"><iconify-icon icon="lucide:x" width="18"></iconify-icon></button>
+      </div>
+      <div class="mt-5 grid gap-4 sm:grid-cols-3">
+        <div class="sm:col-span-2">
+          <label for="f-name" class="mb-1.5 block text-sm font-semibold">Office name</label>
+          <input id="f-name" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-name" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="f-short" class="mb-1.5 block text-sm font-semibold">Short name</label>
+          <input id="f-short" maxlength="10" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-short" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div class="sm:col-span-3">
+          <label for="f-address" class="mb-1.5 block text-sm font-semibold">Address</label>
+          <input id="f-address" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-address" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="f-website" class="mb-1.5 block text-sm font-semibold">Website</label>
+          <input id="f-website" type="url" placeholder="https://example.com" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-website" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="f-branch" class="mb-1.5 block text-sm font-semibold">Branch number</label>
+          <input id="f-branch" inputmode="numeric" placeholder="Optional" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+        </div>
+        <div class="sm:col-span-3">
+          <label class="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+            <input id="f-main" type="checkbox" class="size-4 rounded border-slate-300 accent-secondary" />This is the main office
+          </label>
+          <p data-err="f-main" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div class="sm:col-span-3 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="f-lat" class="mb-1.5 block text-sm font-semibold">Latitude</label>
+            <input id="f-lat" inputmode="decimal" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+            <p data-err="f-lat" class="mt-1 hidden text-xs text-red-600"></p>
+          </div>
+          <div>
+            <label for="f-lng" class="mb-1.5 block text-sm font-semibold">Longitude</label>
+            <input id="f-lng" inputmode="decimal" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+            <p data-err="f-lng" class="mt-1 hidden text-xs text-red-600"></p>
+          </div>
+        </div>
+        <div class="sm:col-span-3">
+          <button type="button" id="locate-btn" class="flex items-center gap-2 text-sm font-semibold text-secondary hover:text-primary"><iconify-icon icon="lucide:locate-fixed" width="16"></iconify-icon>Use my current location</button>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="f-radius" class="mb-1.5 block text-sm font-semibold">Check-in radius</label>
+          <input id="f-radius" type="number" min="1" step="any" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-radius" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="f-unit" class="mb-1.5 block text-sm font-semibold">Unit</label>
+          <select id="f-unit" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"><option value="meter">Meter</option><option value="kilometer">Kilometer</option></select>
+        </div>
+        <div class="sm:col-span-3">
+          <label for="f-vision" class="mb-1.5 block text-sm font-semibold">Vision</label>
+          <textarea id="f-vision" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"></textarea>
+        </div>
+        <div class="sm:col-span-3">
+          <label for="f-mission" class="mb-1.5 block text-sm font-semibold">Mission</label>
+          <textarea id="f-mission" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"></textarea>
+          <p class="mt-1 text-xs text-slate-500">Write one sentence per statement. They show as a list on the profile.</p>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" data-close class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+        <button type="submit" class="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-secondary">Save office</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete dialog -->
+  <dialog id="del-dialog" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/40">
+    <div class="p-6">
+      <h2 id="del-title" class="text-lg font-bold text-primary">Delete office?</h2>
+      <p id="del-text" class="mt-2 text-sm text-slate-600"></p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" id="del-cancel" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Close</button>
+        <button type="button" id="del-confirm" class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Delete office</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status" class="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white opacity-0 transition-opacity"></div>
+
+  <script>
+    // NOTE: data lives in the browser for now. Replace load/save/delete with calls to your API.
+    let offices = [{
+      id: 1,
+      name: 'PT. Himalaya Indo Karya',
+      short: 'HIK',
+      address: 'Rw. Buntu, Kec. Serpong, Kota Tangerang Selatan, Banten 15318',
+      website: 'https://himalayaindokarya.com',
+      isMain: true,
+      branchNumber: null,
+      lat: -6.3171809,
+      lng: 106.6871455,
+      radius: 10,
+      unit: 'meter',
+      vision: 'Bringing inspiration and technology innovation to every need of the business ecosystem.',
+      mission: 'Creating Better Technology that more productive and efficient. Provide solutions for customers. Create sustainable technology innovations. Develop products that are benefit to citizens.',
+    }];
+    let nextId = 2, editingId = null, deletingId = null;
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const radiusText = (o) => `${o.radius} ${o.unit}${Number(o.radius) === 1 ? '' : 's'}`;
+    const host = (u) => { try { return new URL(u).host; } catch { return u; } };
+    const statements = (t) => String(t || '').split(/\.\s+|\n+/).map((x) => x.trim().replace(/\.$/, '')).filter(Boolean);
+    const mapLink = (o) => `https://www.google.com/maps?q=${o.lat},${o.lng}`;
+
+    function renderProfile() {
+      const o = offices.find((x) => x.isMain);
+      if (!o) { $('profile').innerHTML = '<p class="text-sm text-slate-500">No main office yet. Mark one office as the main office.</p>'; return; }
+      $('profile').innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="flex items-center gap-4">
+            <span class="grid size-14 place-items-center rounded-xl bg-primary text-lg font-extrabold text-white">${esc(o.short)}</span>
+            <div><p class="text-sm font-medium text-secondary">Main office</p><h2 class="text-xl font-extrabold text-primary">${esc(o.name)}</h2></div>
+          </div>
+          <button data-edit="${o.id}" class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-primary hover:bg-slate-50"><iconify-icon icon="lucide:pencil" width="16"></iconify-icon>Edit</button>
+        </div>
+        <dl class="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+          <div class="flex gap-3"><iconify-icon icon="lucide:map-pin" width="18" class="mt-0.5 shrink-0 text-secondary"></iconify-icon><div><dt class="font-semibold">Address</dt><dd class="text-slate-600">${esc(o.address)}</dd></div></div>
+          <div class="flex gap-3"><iconify-icon icon="lucide:locate-fixed" width="18" class="mt-0.5 shrink-0 text-secondary"></iconify-icon><div><dt class="font-semibold">Check-in area</dt><dd class="text-slate-600">${radiusText(o)} around <a href="${mapLink(o)}" target="_blank" rel="noopener" class="font-semibold text-secondary hover:text-primary">${o.lat}, ${o.lng}</a></dd></div></div>
+          ${o.website ? `<div class="flex gap-3"><iconify-icon icon="lucide:globe" width="18" class="mt-0.5 shrink-0 text-secondary"></iconify-icon><div><dt class="font-semibold">Website</dt><dd><a href="${esc(o.website)}" target="_blank" rel="noopener" class="text-secondary hover:text-primary">${esc(host(o.website))}</a></dd></div></div>` : ''}
+          ${o.branchNumber ? `<div class="flex gap-3"><iconify-icon icon="lucide:hash" width="18" class="mt-0.5 shrink-0 text-secondary"></iconify-icon><div><dt class="font-semibold">Branch number</dt><dd class="text-slate-600">${esc(o.branchNumber)}</dd></div></div>` : ''}
+        </dl>
+        ${o.vision || o.mission ? `<div class="mt-5 grid gap-5 border-t border-slate-100 pt-5 text-sm sm:grid-cols-2">
+          <div><h3 class="font-bold text-primary">Vision</h3><p class="mt-1.5 leading-relaxed text-slate-600">${esc(o.vision)}</p></div>
+          <div><h3 class="font-bold text-primary">Mission</h3><ul class="mt-1.5 list-disc space-y-1 pl-5 leading-relaxed text-slate-600">${statements(o.mission).map((m) => `<li>${esc(m)}</li>`).join('')}</ul></div>
+        </div>` : ''}`;
+    }
+
+    function render() {
+      renderProfile();
+      const q = $('q').value.trim().toLowerCase();
+      const list = offices.filter((o) => !q || (o.name + ' ' + o.short + ' ' + o.address).toLowerCase().includes(q));
+      $('rows').innerHTML = list.map((o) => `
+        <tr class="align-top hover:bg-slate-50/70">
+          <td class="px-5 py-3"><div class="flex flex-wrap items-center gap-2"><p class="font-semibold">${esc(o.name)}</p>
+            <span class="rounded-md bg-secondary-soft px-1.5 py-0.5 text-xs font-bold text-primary">${esc(o.short)}</span>
+            ${o.isMain ? '<span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">Main</span>' : ''}</div></td>
+          <td class="max-w-[260px] px-3 py-3 text-slate-600">${esc(o.address)}</td>
+          <td class="px-3 py-3 text-slate-600">${o.branchNumber ? esc(o.branchNumber) : '-'}</td>
+          <td class="px-3 py-3"><p class="tabular-nums">${radiusText(o)}</p><a href="${mapLink(o)}" target="_blank" rel="noopener" class="text-xs font-semibold text-secondary hover:text-primary">${o.lat}, ${o.lng}</a></td>
+          <td class="px-3 py-3">${o.website ? `<a href="${esc(o.website)}" target="_blank" rel="noopener" class="text-secondary hover:text-primary">${esc(host(o.website))}</a>` : '-'}</td>
+          <td class="px-5 py-3"><div class="flex justify-end gap-1">
+            <button data-edit="${o.id}" class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-secondary-soft hover:text-primary" aria-label="Edit ${esc(o.name)}"><iconify-icon icon="lucide:pencil" width="16"></iconify-icon></button>
+            <button data-del="${o.id}" class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600" aria-label="Delete ${esc(o.name)}"><iconify-icon icon="lucide:trash-2" width="16"></iconify-icon></button>
+          </div></td></tr>`).join('');
+      $('empty').hidden = list.length > 0;
+    }
+    $('q').addEventListener('input', render);
+
+    let timer;
+    function toast(msg) { const t = $('toast'); t.textContent = msg; t.style.opacity = 1; clearTimeout(timer); timer = setTimeout(() => (t.style.opacity = 0), 2500); }
+
+    // ---- Add / edit ----
+    const dlg = $('off-dialog');
+    const FIELDS = ['f-name', 'f-short', 'f-address', 'f-website', 'f-main', 'f-lat', 'f-lng', 'f-radius'];
+    const fieldErr = (id, msg) => { const p = document.querySelector(`[data-err="${id}"]`); p.textContent = msg || ''; p.classList.toggle('hidden', !msg); $(id).classList.toggle('border-red-400', Boolean(msg)); };
+
+    function openForm(o) {
+      editingId = o ? o.id : null;
+      $('dialog-title').textContent = o ? 'Edit office' : 'Add office';
+      $('f-name').value = o?.name || ''; $('f-short').value = o?.short || ''; $('f-address').value = o?.address || ''; $('f-website').value = o?.website || '';
+      $('f-branch').value = o?.branchNumber ?? ''; $('f-main').checked = o ? o.isMain : !offices.some((x) => x.isMain);
+      $('f-lat').value = o?.lat ?? ''; $('f-lng').value = o?.lng ?? ''; $('f-radius').value = o?.radius ?? 10; $('f-unit').value = o?.unit || 'meter';
+      $('f-vision').value = o?.vision || ''; $('f-mission').value = o?.mission || '';
+      FIELDS.forEach((id) => fieldErr(id, '')); dlg.showModal(); $('f-name').focus();
+    }
+    $('add-btn').addEventListener('click', () => openForm(null));
+    document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => dlg.close()));
+
+    $('locate-btn').addEventListener('click', () => {
+      if (!navigator.geolocation) { toast('Your browser does not support location.'); return; }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { $('f-lat').value = pos.coords.latitude.toFixed(7); $('f-lng').value = pos.coords.longitude.toFixed(7); fieldErr('f-lat', ''); fieldErr('f-lng', ''); },
+        () => toast('Could not get your location. Allow location access or enter it manually.'));
+    });
+
+    $('off-form').addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const v = (id) => $(id).value.trim();
+      const lat = parseFloat(v('f-lat')), lng = parseFloat(v('f-lng')), radius = parseFloat(v('f-radius')), unit = $('f-unit').value;
+      const meters = unit === 'kilometer' ? radius * 1000 : radius, isMain = $('f-main').checked, website = v('f-website');
+      let urlOk = true; if (website) { try { urlOk = /^https?:$/.test(new URL(website).protocol); } catch { urlOk = false; } }
+      const checks = [
+        ['f-name', !v('f-name'), 'Enter the office name.'], ['f-short', !v('f-short'), 'Enter a short name, like HIK.'], ['f-address', !v('f-address'), 'Enter the office address.'],
+        ['f-website', !urlOk, 'Enter a full web address, like https://example.com.'],
+        ['f-main', !isMain && !offices.some((o) => o.isMain && o.id !== editingId), 'Choose another office as the main office first.'],
+        ['f-lat', !(lat >= -90 && lat <= 90), 'Enter a latitude between -90 and 90.'], ['f-lng', !(lng >= -180 && lng <= 180), 'Enter a longitude between -180 and 180.'],
+        ['f-radius', !(meters >= 5 && meters <= 5000), 'Enter a radius between 5 meters and 5 kilometers.'],
+      ];
+      checks.forEach(([id, bad, msg]) => fieldErr(id, bad ? msg : ''));
+      if (checks.some(([, bad]) => bad)) return;
+
+      const data = { name: v('f-name'), short: v('f-short'), address: v('f-address'), website, isMain, branchNumber: v('f-branch') || null, lat, lng, radius, unit, vision: v('f-vision'), mission: v('f-mission') };
+      if (isMain) offices.forEach((o) => { o.isMain = false; }); // only one main office
+      if (editingId) { Object.assign(offices.find((o) => o.id === editingId), data); toast('Office saved'); }
+      else { offices.push({ id: nextId++, ...data }); toast('Office added'); }
+      dlg.close(); render();
+    });
+
+    // ---- Edit / delete (event delegation) ----
+    document.addEventListener('click', (ev) => {
+      const edit = ev.target.closest('[data-edit]'), del = ev.target.closest('[data-del]');
+      if (edit) openForm(offices.find((o) => o.id === Number(edit.dataset.edit)));
+      if (del) {
+        const o = offices.find((x) => x.id === Number(del.dataset.del)); deletingId = o.id;
+        $('del-title').textContent = o.isMain ? 'Main office can\'t be deleted' : 'Delete office?';
+        $('del-text').textContent = o.isMain ? `${o.name} is the main office. Make another office the main office before deleting it.`
+          : `${o.name} will be removed. Employees will no longer be able to check in there. This cannot be undone.`;
+        $('del-confirm').classList.toggle('hidden', o.isMain); $('del-dialog').showModal();
+      }
+    });
+    $('del-cancel').addEventListener('click', () => $('del-dialog').close());
+    $('del-confirm').addEventListener('click', () => { offices = offices.filter((o) => o.id !== deletingId); $('del-dialog').close(); render(); toast('Office deleted'); });
+
+    // ---- Mobile sidebar ----
+    const sidebar = $('sidebar'), scrim = $('scrim');
+    const toggleMenu = (open) => { sidebar.classList.toggle('-translate-x-full', !open); scrim.classList.toggle('hidden', !open); };
+    $('menu-btn').addEventListener('click', () => toggleMenu(true));
+    scrim.addEventListener('click', () => toggleMenu(false));
+
+    render();
+  </script>
+</body>
+</html>

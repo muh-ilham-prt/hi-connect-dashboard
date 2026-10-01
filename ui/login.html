@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in | Hi-Connect Attendance</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: { DEFAULT: '#1a2e75', dark: '#13235a' },
+            secondary: { DEFAULT: '#425aad', soft: '#e8ecf8' },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Soft concentric rings behind the clock, built from the secondary color */
+    .rings {
+      background:
+        radial-gradient(circle at 100% 100%, transparent 0 140px, rgba(66, 90, 173, .55) 141px 142px, transparent 143px),
+        radial-gradient(circle at 100% 100%, transparent 0 220px, rgba(66, 90, 173, .45) 221px 222px, transparent 223px),
+        radial-gradient(circle at 100% 100%, transparent 0 300px, rgba(66, 90, 173, .35) 301px 302px, transparent 303px),
+        radial-gradient(circle at 100% 100%, transparent 0 380px, rgba(66, 90, 173, .25) 381px 382px, transparent 383px);
+    }
+    .tick { animation: tick 1s steps(1) infinite; }
+    @keyframes tick { 50% { opacity: .25; } }
+    @media (prefers-reduced-motion: reduce) { .tick { animation: none; } }
+  </style>
+</head>
+
+<body class="min-h-screen bg-white font-sans text-slate-800 antialiased">
+  <main class="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
+
+    <!-- Brand panel -->
+    <section class="rings relative flex flex-col justify-between gap-10 overflow-hidden bg-primary px-6 py-8 text-white sm:px-10 lg:px-14 lg:py-12">
+      <div class="flex items-center gap-3">
+        <span class="grid size-11 place-items-center rounded-xl bg-white text-primary">
+          <iconify-icon icon="lucide:fingerprint" width="26" height="26"></iconify-icon>
+        </span>
+        <span class="text-xl font-extrabold tracking-tight">Hi-Connect</span>
+      </div>
+
+      <div class="max-w-md">
+        <h1 class="text-3xl font-extrabold leading-tight sm:text-4xl">Every check-in, in one place.</h1>
+        <p class="mt-4 text-base leading-relaxed text-white/75">
+          Review attendance, approve leave, and keep every site on schedule from a single dashboard.
+        </p>
+
+        <!-- Live clock: the one memorable element on this panel -->
+        <div class="mt-10 inline-block rounded-2xl border border-white/20 bg-white/10 px-6 py-5 backdrop-blur-sm">
+          <div class="flex items-center gap-2 text-sm text-white/75">
+            <iconify-icon icon="lucide:clock-3" width="16" height="16"></iconify-icon>
+            <span id="clock-date">Loading date</span>
+          </div>
+          <div class="mt-1 flex items-baseline gap-1 text-5xl font-bold tabular-nums sm:text-6xl" aria-live="off">
+            <span id="clock-h">00</span><span class="tick">:</span><span id="clock-m">00</span>
+            <span id="clock-s" class="ml-2 text-2xl font-semibold text-white/60">00</span>
+          </div>
+          <p id="clock-zone" class="mt-1 text-sm text-white/60"></p>
+        </div>
+      </div>
+
+      <p class="hidden text-sm text-white/60 lg:block">&copy; <span id="year"></span> Hi-Connect. All rights reserved.</p>
+    </section>
+
+    <!-- Form panel -->
+    <section class="flex items-center justify-center px-6 py-12 sm:px-10">
+      <div class="w-full max-w-sm">
+        <h2 class="text-2xl font-bold text-primary">Sign in to your dashboard</h2>
+        <p class="mt-2 text-sm text-slate-500">Use your admin or HR account to manage employee attendance.</p>
+
+        <!-- Error message -->
+        <div id="form-error" role="alert" hidden
+             class="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
+          <iconify-icon icon="lucide:alert-circle" width="18" height="18" class="mt-0.5 shrink-0"></iconify-icon>
+          <span id="form-error-text"></span>
+        </div>
+
+        <form id="login-form" class="mt-6 space-y-5" novalidate>
+          <div>
+            <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">Work email</label>
+            <div class="relative">
+              <iconify-icon icon="lucide:mail" width="18" height="18"
+                class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></iconify-icon>
+              <input id="email" name="email" type="email" autocomplete="username" required placeholder="name@company.com"
+                class="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm placeholder:text-slate-400 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+            </div>
+            <p id="email-error" class="mt-1 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div>
+            <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password</label>
+            <div class="relative">
+              <iconify-icon icon="lucide:lock" width="18" height="18"
+                class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></iconify-icon>
+              <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password"
+                class="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-11 text-sm placeholder:text-slate-400 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+              <button type="button" id="toggle-password" aria-label="Show password" aria-pressed="false"
+                class="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-slate-500 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40">
+                <iconify-icon id="toggle-icon" icon="lucide:eye" width="18" height="18"></iconify-icon>
+              </button>
+            </div>
+            <p id="password-error" class="mt-1 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <label class="flex cursor-pointer items-center gap-2 text-slate-600">
+              <input id="remember" type="checkbox" class="size-4 rounded border-slate-300 accent-secondary" />
+              Keep me signed in
+            </label>
+            <a href="#" class="font-semibold text-secondary hover:text-primary focus-visible:outline-none focus-visible:underline">Forgot password?</a>
+          </div>
+
+          <button id="submit-btn" type="submit"
+            class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70">
+            <iconify-icon id="submit-spinner" icon="lucide:loader-2" width="18" height="18" class="hidden animate-spin"></iconify-icon>
+            <span id="submit-label">Sign in</span>
+          </button>
+        </form>
+
+        <p class="mt-8 flex items-center gap-2 text-xs text-slate-500">
+          <iconify-icon icon="lucide:shield-check" width="16" height="16" class="text-secondary"></iconify-icon>
+          Access is limited to authorized administrators.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ---------- Live clock ----------
+    const pad = (n) => String(n).padStart(2, '0');
+    const clockEls = {
+      h: document.getElementById('clock-h'),
+      m: document.getElementById('clock-m'),
+      s: document.getElementById('clock-s'),
+      date: document.getElementById('clock-date'),
+      zone: document.getElementById('clock-zone'),
+    };
+    const dateFmt = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    function updateClock() {
+      const now = new Date();
+      clockEls.h.textContent = pad(now.getHours());
+      clockEls.m.textContent = pad(now.getMinutes());
+      clockEls.s.textContent = pad(now.getSeconds());
+      clockEls.date.textContent = dateFmt.format(now);
+      clockEls.zone.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ---------- Password visibility ----------
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('toggle-password');
+    const toggleIcon = document.getElementById('toggle-icon');
+
+    toggleBtn.addEventListener('click', () => {
+      const show = passwordInput.type === 'password';
+      passwordInput.type = show ? 'text' : 'password';
+      toggleIcon.setAttribute('icon', show ? 'lucide:eye-off' : 'lucide:eye');
+      toggleBtn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      toggleBtn.setAttribute('aria-pressed', String(show));
+    });
+
+    // ---------- Validation helpers ----------
+    const form = document.getElementById('login-form');
+    const emailInput = document.getElementById('email');
+    const formError = document.getElementById('form-error');
+    const formErrorText = document.getElementById('form-error-text');
+
+    function setFieldError(input, errorId, message) {
+      const el = document.getElementById(errorId);
+      el.textContent = message || '';
+      el.classList.toggle('hidden', !message);
+      input.classList.toggle('border-red-400', Boolean(message));
+      input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    }
+
+    function showFormError(message) {
+      formErrorText.textContent = message;
+      formError.hidden = false;
+    }
+
+    function validate() {
+      let valid = true;
+      const email = emailInput.value.trim();
+      if (!email) {
+        setFieldError(emailInput, 'email-error', 'Enter your work email.');
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setFieldError(emailInput, 'email-error', 'Enter a valid email, like name@company.com.');
+        valid = false;
+      } else {
+        setFieldError(emailInput, 'email-error', '');
+      }
+
+      if (!passwordInput.value) {
+        setFieldError(passwordInput, 'password-error', 'Enter your password.');
+        valid = false;
+      } else {
+        setFieldError(passwordInput, 'password-error', '');
+      }
+      return valid;
+    }
+
+    // ---------- Submit ----------
+    const submitBtn = document.getElementById('submit-btn');
+    const submitLabel = document.getElementById('submit-label');
+    const submitSpinner = document.getElementById('submit-spinner');
+
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      submitSpinner.classList.toggle('hidden', !loading);
+      submitLabel.textContent = loading ? 'Signing in...' : 'Sign in';
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      formError.hidden = true;
+      if (!validate()) return;
+
+      setLoading(true);
+      try {
+        // TODO: replace with your real auth endpoint
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emailInput.value.trim(),
+            password: passwordInput.value,
+            remember: document.getElementById('remember').checked,
+          }),
+        });
+
+        if (response.status === 401) {
+          showFormError('Email or password is incorrect. Check your details and try again.');
+          return;
+        }
+        if (!response.ok) throw new Error('Request failed');
+
+        const data = await response.json();
+        // TODO: store the token your backend returns (e.g. httpOnly cookie or secure storage)
+        window.location.href = data.redirect || '/dashboard';
+      } catch (err) {
+        showFormError('We could not reach the server. Check your connection and try again.');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Clear field errors while typing
+    emailInput.addEventListener('input', () => setFieldError(emailInput, 'email-error', ''));
+    passwordInput.addEventListener('input', () => setFieldError(passwordInput, 'password-error', ''));
+  </script>
+</body>
+</html>

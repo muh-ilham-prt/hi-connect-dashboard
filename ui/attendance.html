@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attendance | Hi-Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+        colors: { primary: { DEFAULT: '#1a2e75', dark: '#13235a' }, secondary: { DEFAULT: '#425aad', soft: '#e8ecf8' } },
+      } },
+    };
+  </script>
+</head>
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 flex w-64 -translate-x-full flex-col bg-primary text-white transition-transform lg:translate-x-0">
+    <div class="flex items-center gap-3 px-6 py-6">
+      <span class="grid size-10 place-items-center rounded-xl bg-white text-primary"><iconify-icon icon="lucide:fingerprint" width="24" height="24"></iconify-icon></span>
+      <span class="text-lg font-extrabold">Hi-Connect</span>
+    </div>
+    <nav class="flex-1 space-y-1 px-3 text-sm font-medium" aria-label="Main">
+      <a href="dashboard.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:layout-dashboard" width="18"></iconify-icon>Analytics</a>
+      <a href="employees.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:users" width="18"></iconify-icon>Employees</a>
+      <a href="attendance.html" aria-current="page" class="flex items-center gap-3 rounded-lg bg-secondary px-3 py-2.5"><iconify-icon icon="lucide:calendar-check" width="18"></iconify-icon>Attendance</a>
+      <a href="leave.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:calendar-off" width="18"></iconify-icon>Leave requests</a>
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden"><iconify-icon icon="lucide:settings" width="18"></iconify-icon>Settings<iconify-icon icon="lucide:chevron-down" width="16" class="ml-auto transition-transform group-open:rotate-180"></iconify-icon></summary>
+        <div class="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
+          <a href="office.html" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:building-2" width="16"></iconify-icon>Office</a>
+          <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:clock-3" width="16"></iconify-icon>Shift schedule</a>
+          <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:shield-check" width="16"></iconify-icon>Roles and access</a>
+        </div>
+      </details>
+    </nav>
+    <a href="login.html" class="m-3 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:log-out" width="18"></iconify-icon>Sign out</a>
+  </aside>
+  <div id="scrim" class="fixed inset-0 z-20 hidden bg-slate-900/40 lg:hidden"></div>
+
+  <div class="lg:pl-64">
+    <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-8">
+      <button id="menu-btn" class="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Open menu"><iconify-icon icon="lucide:menu" width="20"></iconify-icon></button>
+      <div class="ml-auto flex items-center gap-3">
+        <button class="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Notifications"><iconify-icon icon="lucide:bell" width="20"></iconify-icon></button>
+        <span class="grid size-9 place-items-center rounded-full bg-secondary-soft text-sm font-bold text-primary" aria-label="Signed in as HR admin">HR</span>
+      </div>
+    </header>
+
+    <main class="space-y-5 px-4 py-6 sm:px-8">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-extrabold text-primary">Attendance</h1>
+          <p id="date-label" class="text-sm text-slate-500"></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
+            <button id="prev-day" class="grid size-8 place-items-center rounded-md text-slate-600 hover:bg-slate-100" aria-label="Previous working day"><iconify-icon icon="lucide:chevron-left" width="16"></iconify-icon></button>
+            <input id="date" type="date" aria-label="Attendance date" class="rounded-md px-2 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+            <button id="next-day" class="grid size-8 place-items-center rounded-md text-slate-600 hover:bg-slate-100 disabled:opacity-40" aria-label="Next working day"><iconify-icon icon="lucide:chevron-right" width="16"></iconify-icon></button>
+          </div>
+          <button id="export-btn" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2">
+            <iconify-icon icon="lucide:download" width="18"></iconify-icon>Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Day summary -->
+      <section id="summary" class="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Summary for the selected day"></section>
+
+      <!-- Filters -->
+      <div class="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+        <div class="relative">
+          <iconify-icon icon="lucide:search" width="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></iconify-icon>
+          <input id="q" type="search" placeholder="Search by name" aria-label="Search employees"
+            class="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+        </div>
+        <select id="f-dept" aria-label="Filter by department" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"></select>
+        <select id="f-status" aria-label="Filter by status" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30">
+          <option value="">All statuses</option><option>On time</option><option>Late</option><option>Absent</option><option>On leave</option>
+        </select>
+      </div>
+
+      <section class="rounded-xl border border-slate-200 bg-white">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[760px] text-left text-sm">
+            <thead class="border-b border-slate-200 text-xs text-slate-500">
+              <tr><th class="px-5 py-3 font-semibold">Employee</th><th class="px-3 py-3 font-semibold">Check-in</th><th class="px-3 py-3 font-semibold">Check-out</th><th class="px-3 py-3 font-semibold">Hours</th><th class="px-3 py-3 font-semibold">Location</th><th class="px-3 py-3 font-semibold">Status</th><th class="px-5 py-3 font-semibold">Permission</th></tr>
+            </thead>
+            <tbody id="rows" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div id="empty" hidden class="px-5 py-14 text-center">
+          <iconify-icon icon="lucide:calendar-search" width="36" class="text-slate-300"></iconify-icon>
+          <p class="mt-2 font-semibold">No records match these filters</p>
+          <p class="text-sm text-slate-500">Try a different search, or clear the filters to see everyone.</p>
+          <button id="clear-btn" class="mt-4 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-primary hover:bg-slate-50">Clear filters</button>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-5 py-3 text-sm text-slate-500">
+          <span id="range-label"></span>
+          <div class="flex items-center gap-1">
+            <button id="prev" class="grid size-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40" aria-label="Previous page"><iconify-icon icon="lucide:chevron-left" width="16"></iconify-icon></button>
+            <span id="page-label" class="px-2 tabular-nums"></span>
+            <button id="next" class="grid size-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40" aria-label="Next page"><iconify-icon icon="lucide:chevron-right" width="16"></iconify-icon></button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" role="status" class="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white opacity-0 transition-opacity"></div>
+
+  <script>
+    // NOTE: sample data generated in the browser. Replace getRecord() and the permission handler with API calls.
+    const DEPTS = ['Operations', 'Sales', 'Finance', 'Engineering', 'Customer support'];
+    const LOCS = ['Head office', 'Branch Depok', 'Warehouse A', 'Warehouse B', 'Remote'];
+    const SHIFT_START = 8 * 60, PER_PAGE = 10;
+    const STATUS_STYLE = { 'On time': 'bg-emerald-50 text-emerald-700', Late: 'bg-amber-50 text-amber-700', Absent: 'bg-red-50 text-red-700', 'On leave': 'bg-secondary-soft text-primary' };
+    const names = ['Siti Rahmawati', 'Budi Santoso', 'Rina Wulandari', 'Agus Prasetyo', 'Dewi Lestari', 'Fajar Nugroho', 'Nadia Putri', 'Rizky Ramadhan', 'Maya Anggraini', 'Dimas Saputra', 'Lina Marlina', 'Andi Wijaya', 'Putri Handayani', 'Hendra Kusuma', 'Yuni Astuti', 'Eko Setiawan', 'Tari Permata', 'Bayu Firmansyah', 'Ayu Kartika', 'Joko Susilo', 'Intan Maharani', 'Reza Pahlevi', 'Wulan Sari', 'Teguh Hidayat'];
+    const emps = names.map((n, i) => ({ id: i + 1, name: n, dept: DEPTS[i % 5], loc: LOCS[(i * 3) % 5] }));
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const seeded = (i) => { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); };
+    const pad = (n) => String(n).padStart(2, '0');
+    const hhmm = (m) => (m == null ? '-' : `${pad(Math.floor(m / 60))}:${pad(m % 60)}`);
+    const toMin = (v) => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
+    const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const initials = (n) => n.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+    const isWeekend = (d) => d.getDay() % 6 === 0;
+
+    // ---- Working-day date handling ----
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    function snap(d, step) { const x = new Date(d); while (isWeekend(x)) x.setDate(x.getDate() + step); return x; }
+    let current = snap(today, -1), page = 1, editing = null;
+
+    // ---- Records ----
+    function getRecord(e) {
+      const seed = Math.floor(current.getTime() / 864e5) * 31 + e.id, r = seeded(seed);
+      if (r < 0.07) return { att: 'Absent' };
+      if (r < 0.13) return { att: 'On leave' };
+      const inM = 7 * 60 + 10 + Math.round(seeded(seed + 5) * 80);
+      const nowM = new Date().getHours() * 60 + new Date().getMinutes();
+      const out = current.getTime() === today.getTime() && nowM < 17 * 60 ? null : 17 * 60 + Math.round(seeded(seed + 9) * 80);
+      return { att: 'Present', inM, outM: out };
+    }
+    function view(e) {
+      const rec = getRecord(e);
+      const status = rec.att === 'Present' ? (rec.inM > SHIFT_START ? 'Late' : 'On time') : rec.att;
+      const hours = rec.inM != null && rec.outM != null ? `${Math.floor((rec.outM - rec.inM) / 60)}h ${pad((rec.outM - rec.inM) % 60)}m` : '-';
+      return { e, rec, status, hours };
+    }
+
+    function filtered() {
+      const q = $('q').value.trim().toLowerCase(), d = $('f-dept').value, s = $('f-status').value;
+      return emps.filter((e) => (!d || e.dept === d) && (!q || e.name.toLowerCase().includes(q))).map(view).filter((v) => !s || v.status === s);
+    }
+
+    // ---- Render ----
+    function render() {
+      $('date').value = key(current); $('date').max = key(today);
+      $('date-label').textContent = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(current) + ` · Shift starts at ${hhmm(SHIFT_START)}`;
+      const next = new Date(current); next.setDate(next.getDate() + 1); $('next-day').disabled = snap(next, 1) > today;
+
+      const all = emps.map(view), count = (s) => all.filter((v) => v.status === s).length;
+      $('summary').innerHTML = [['On time', 'lucide:user-check'], ['Late', 'lucide:alarm-clock'], ['Absent', 'lucide:user-x'], ['On leave', 'lucide:tree-palm']].map(([s, ic]) => `
+        <button data-status="${s}" class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40">
+          <span><span class="block text-sm font-medium text-slate-500">${s}</span><span class="block text-2xl font-extrabold text-primary tabular-nums">${count(s)}</span></span>
+          <span class="grid size-9 place-items-center rounded-lg bg-secondary-soft text-secondary"><iconify-icon icon="${ic}" width="18"></iconify-icon></span></button>`).join('');
+
+      const list = filtered(), pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+      page = Math.min(page, pages);
+      const start = (page - 1) * PER_PAGE, slice = list.slice(start, start + PER_PAGE);
+      $('rows').innerHTML = slice.map(({ e, rec, status, hours }) => `
+        <tr class="hover:bg-slate-50/70">
+          <td class="px-5 py-3"><div class="flex items-center gap-3">
+            <span class="grid size-9 shrink-0 place-items-center rounded-full bg-secondary-soft text-xs font-bold text-primary">${initials(e.name)}</span>
+            <div class="min-w-0"><p class="truncate font-semibold">${esc(e.name)}</p><p class="truncate text-xs text-slate-500">${esc(e.dept)}</p></div></div></td>
+          <td class="px-3 py-3 tabular-nums">${hhmm(rec.inM)}</td>
+          <td class="px-3 py-3 tabular-nums">${rec.inM != null && rec.outM == null ? '<span class="text-slate-500">Working</span>' : hhmm(rec.outM)}</td>
+          <td class="px-3 py-3 tabular-nums">${hours}</td>
+          <td class="px-3 py-3 text-slate-600">${rec.att === 'Present' ? esc(e.loc) : '-'}</td>
+          <td class="px-3 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLE[status]}">${status}</span></td>
+          <td class="px-5 py-3">${permissionCell(e, status)}</td></tr>`).join('');
+      $('empty').hidden = list.length > 0;
+      $('range-label').textContent = list.length ? `Showing ${start + 1}-${start + slice.length} of ${list.length}` : 'No results';
+      $('page-label').textContent = `Page ${page} of ${pages}`;
+      $('prev').disabled = page <= 1; $('next').disabled = page >= pages;
+    }
+
+    // ---- Date navigation ----
+    function go(step) { const d = new Date(current); d.setDate(d.getDate() + step); current = snap(d, step); page = 1; render(); }
+    $('prev-day').addEventListener('click', () => go(-1));
+    $('next-day').addEventListener('click', () => go(1));
+    $('date').addEventListener('change', (ev) => {
+      if (!ev.target.value) return;
+      const d = new Date(ev.target.value + 'T00:00:00'); current = snap(d > today ? today : d, -1); page = 1; render();
+    });
+
+    // ---- Filters and paging ----
+    $('f-dept').innerHTML = '<option value="">All departments</option>' + DEPTS.map((d) => `<option>${d}</option>`).join('');
+    ['q', 'f-dept', 'f-status'].forEach((id) => $(id).addEventListener('input', () => { page = 1; render(); }));
+    $('summary').addEventListener('click', (ev) => { const b = ev.target.closest('[data-status]'); if (b) { $('f-status').value = b.dataset.status; page = 1; render(); } });
+    $('clear-btn').addEventListener('click', () => { $('q').value = ''; $('f-dept').value = ''; $('f-status').value = ''; page = 1; render(); });
+    $('prev').addEventListener('click', () => { page--; render(); });
+    $('next').addEventListener('click', () => { page++; render(); });
+
+    // ---- Toast ----
+    let timer;
+    function toast(msg) { const t = $('toast'); t.textContent = msg; t.style.opacity = 1; clearTimeout(timer); timer = setTimeout(() => (t.style.opacity = 0), 2500); }
+
+    // ---- Export CSV (respects current filters) ----
+    $('export-btn').addEventListener('click', () => {
+      const cell = (v) => `"${String(v).replace(/"/g, '""')}"`;
+      const lines = [['Employee', 'Department', 'Check-in', 'Check-out', 'Hours', 'Location', 'Status', 'Access code'].join(',')]
+        .concat(filtered().map(({ e, rec, status, hours }) => [e.name, e.dept, hhmm(rec.inM), hhmm(rec.outM), hours, rec.att === 'Present' ? e.loc : '-', status, permits[permitKey(e)]?.code || ''].map(cell).join(',')));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' }));
+      a.download = `attendance-${key(current)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+      toast('Attendance exported');
+    });
+
+    // ---- Late permission + access code ----
+    // NOTE: generate and store the code on your server (with an expiry) instead of in the browser.
+    const permits = {}; // `${dateKey}:${employeeId}` -> { code, at }
+    const permitKey = (e) => `${key(current)}:${e.id}`;
+    function makeCode() { const buf = new Uint32Array(1); crypto.getRandomValues(buf); return String(100000 + (buf[0] % 900000)); }
+
+    function permissionCell(e, status) {
+      if (status !== 'Late') return '<span class="text-slate-400">-</span>';
+      const p = permits[permitKey(e)];
+      if (!p) return `<button data-grant="${e.id}" class="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"><iconify-icon icon="lucide:shield-check" width="16"></iconify-icon>Give permission</button>`;
+      return `<div class="flex items-center gap-2"><div><p class="font-mono text-base font-bold tracking-widest text-primary">${p.code}</p><p class="text-xs text-slate-500">Permission given at ${hhmm(p.at.getHours() * 60 + p.at.getMinutes())}</p></div>
+        <button data-copy="${p.code}" class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-secondary-soft hover:text-primary" aria-label="Copy access code for ${esc(e.name)}"><iconify-icon icon="lucide:copy" width="16"></iconify-icon></button></div>`;
+    }
+
+    $('rows').addEventListener('click', async (ev) => {
+      const grant = ev.target.closest('[data-grant]'), copy = ev.target.closest('[data-copy]');
+      if (grant) {
+        const e = emps.find((x) => x.id === Number(grant.dataset.grant));
+        permits[permitKey(e)] = { code: makeCode(), at: new Date() };
+        render(); toast(`Permission given to ${e.name}. Access code generated.`);
+      } else if (copy) {
+        try { await navigator.clipboard.writeText(copy.dataset.copy); toast('Access code copied'); }
+        catch { toast('Could not copy. Select the code and copy it manually.'); }
+      }
+    });
+
+    // ---- Mobile sidebar ----
+    const sidebar = $('sidebar'), scrim = $('scrim');
+    const toggleMenu = (open) => { sidebar.classList.toggle('-translate-x-full', !open); scrim.classList.toggle('hidden', !open); };
+    $('menu-btn').addEventListener('click', () => toggleMenu(true));
+    scrim.addEventListener('click', () => toggleMenu(false));
+
+    render();
+  </script>
+</body>
+</html>

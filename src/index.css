@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --color-primary: #1a2e75;
+  --color-primary-dark: #13235a;
+  --color-secondary: #425aad;
+  --color-secondary-soft: #e8ecf8;
+  --color-accent: #62929e;
+  --color-dark: #292929;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Blinking colon on the clock */
+.tick {
+  animation: tick 1s steps(1) infinite;
+}
+@keyframes tick {
+  50% {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tick {
+    animation: none;
+  }
+}
+

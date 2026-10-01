@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Employees | Hi-Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+        colors: { primary: { DEFAULT: '#1a2e75', dark: '#13235a' }, secondary: { DEFAULT: '#425aad', soft: '#e8ecf8' } },
+      } },
+    };
+  </script>
+</head>
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 flex w-64 -translate-x-full flex-col bg-primary text-white transition-transform lg:translate-x-0">
+    <div class="flex items-center gap-3 px-6 py-6">
+      <span class="grid size-10 place-items-center rounded-xl bg-white text-primary"><iconify-icon icon="lucide:fingerprint" width="24" height="24"></iconify-icon></span>
+      <span class="text-lg font-extrabold">Hi-Connect</span>
+    </div>
+    <nav class="flex-1 space-y-1 px-3 text-sm font-medium" aria-label="Main">
+      <a href="dashboard.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:layout-dashboard" width="18"></iconify-icon>Analytics</a>
+      <a href="employees.html" aria-current="page" class="flex items-center gap-3 rounded-lg bg-secondary px-3 py-2.5"><iconify-icon icon="lucide:users" width="18"></iconify-icon>Employees</a>
+      <a href="attendance.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:calendar-check" width="18"></iconify-icon>Attendance</a>
+      <a href="leave.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:calendar-off" width="18"></iconify-icon>Leave requests</a>
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden"><iconify-icon icon="lucide:settings" width="18"></iconify-icon>Settings<iconify-icon icon="lucide:chevron-down" width="16" class="ml-auto transition-transform group-open:rotate-180"></iconify-icon></summary>
+        <div class="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
+          <a href="office.html" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:building-2" width="16"></iconify-icon>Office</a>
+          <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:clock-3" width="16"></iconify-icon>Shift schedule</a>
+          <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:shield-check" width="16"></iconify-icon>Roles and access</a>
+        </div>
+      </details>
+    </nav>
+    <a href="login.html" class="m-3 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/75 hover:bg-white/10 hover:text-white"><iconify-icon icon="lucide:log-out" width="18"></iconify-icon>Sign out</a>
+  </aside>
+  <div id="scrim" class="fixed inset-0 z-20 hidden bg-slate-900/40 lg:hidden"></div>
+
+  <div class="lg:pl-64">
+    <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-8">
+      <button id="menu-btn" class="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Open menu"><iconify-icon icon="lucide:menu" width="20"></iconify-icon></button>
+      <div class="ml-auto flex items-center gap-3">
+        <button class="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Notifications"><iconify-icon icon="lucide:bell" width="20"></iconify-icon></button>
+        <span class="grid size-9 place-items-center rounded-full bg-secondary-soft text-sm font-bold text-primary" aria-label="Signed in as HR admin">HR</span>
+      </div>
+    </header>
+
+    <main class="space-y-5 px-4 py-6 sm:px-8">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-extrabold text-primary">Employees</h1>
+          <p id="count-label" class="text-sm text-slate-500"></p>
+        </div>
+        <button id="add-btn" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2">
+          <iconify-icon icon="lucide:user-plus" width="18"></iconify-icon>Add employee
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+        <div class="relative">
+          <iconify-icon icon="lucide:search" width="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></iconify-icon>
+          <input id="q" type="search" placeholder="Search by name, ID or email" aria-label="Search employees"
+            class="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+        </div>
+        <select id="f-dept" aria-label="Filter by department" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"></select>
+        <select id="f-status" aria-label="Filter by status" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30">
+          <option value="">All statuses</option><option>Active</option><option>On leave</option><option>Inactive</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <section class="rounded-xl border border-slate-200 bg-white">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[720px] text-left text-sm">
+            <thead class="border-b border-slate-200 text-xs text-slate-500">
+              <tr><th class="px-5 py-3 font-semibold">Employee</th><th class="px-3 py-3 font-semibold">Department</th><th class="px-3 py-3 font-semibold">Work location</th><th class="px-3 py-3 font-semibold">Status</th><th class="px-5 py-3 text-right font-semibold">Actions</th></tr>
+            </thead>
+            <tbody id="rows" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div id="empty" hidden class="px-5 py-14 text-center">
+          <iconify-icon icon="lucide:users-round" width="36" class="text-slate-300"></iconify-icon>
+          <p class="mt-2 font-semibold">No employees match these filters</p>
+          <p class="text-sm text-slate-500">Try a different search, or clear the filters to see everyone.</p>
+          <button id="clear-btn" class="mt-4 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-primary hover:bg-slate-50">Clear filters</button>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-5 py-3 text-sm text-slate-500">
+          <span id="range-label"></span>
+          <div class="flex items-center gap-1">
+            <button id="prev" class="grid size-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40" aria-label="Previous page"><iconify-icon icon="lucide:chevron-left" width="16"></iconify-icon></button>
+            <span id="page-label" class="px-2 tabular-nums"></span>
+            <button id="next" class="grid size-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40" aria-label="Next page"><iconify-icon icon="lucide:chevron-right" width="16"></iconify-icon></button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add / edit dialog -->
+  <dialog id="emp-dialog" class="w-[calc(100%-2rem)] max-w-lg rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/40">
+    <form id="emp-form" method="dialog" novalidate class="p-6">
+      <div class="flex items-start justify-between">
+        <h2 id="dialog-title" class="text-lg font-bold text-primary">Add employee</h2>
+        <button type="button" data-close class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Close"><iconify-icon icon="lucide:x" width="18"></iconify-icon></button>
+      </div>
+      <div class="mt-5 grid gap-4 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label for="f-name" class="mb-1.5 block text-sm font-semibold">Full name</label>
+          <input id="f-name" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-name" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="f-email" class="mb-1.5 block text-sm font-semibold">Work email</label>
+          <input id="f-email" type="email" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-email" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="f-edept" class="mb-1.5 block text-sm font-semibold">Department</label>
+          <select id="f-edept" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"></select>
+        </div>
+        <div>
+          <label for="f-role" class="mb-1.5 block text-sm font-semibold">Position</label>
+          <input id="f-role" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30" />
+          <p data-err="f-role" class="mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="f-loc" class="mb-1.5 block text-sm font-semibold">Work location</label>
+          <select id="f-loc" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"></select>
+        </div>
+        <div>
+          <label for="f-estatus" class="mb-1.5 block text-sm font-semibold">Status</label>
+          <select id="f-estatus" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30">
+            <option>Active</option><option>On leave</option><option>Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" data-close class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+        <button type="submit" id="save-btn" class="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-secondary">Save employee</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete dialog -->
+  <dialog id="del-dialog" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/40">
+    <div class="p-6">
+      <h2 class="text-lg font-bold text-primary">Delete employee?</h2>
+      <p id="del-text" class="mt-2 text-sm text-slate-600"></p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" id="del-cancel" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+        <button type="button" id="del-confirm" class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Delete employee</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status" class="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white opacity-0 transition-opacity"></div>
+
+  <script>
+    // NOTE: sample data. Replace load/save/delete with calls to your API.
+    const DEPTS = ['Operations', 'Sales', 'Finance', 'Engineering', 'Customer support'];
+    const LOCS = ['Head office', 'Branch Depok', 'Warehouse A', 'Warehouse B', 'Remote'];
+    const STATUS_STYLE = { Active: 'bg-emerald-50 text-emerald-700', 'On leave': 'bg-amber-50 text-amber-700', Inactive: 'bg-slate-100 text-slate-600' };
+    const PER_PAGE = 8;
+
+    const names = ['Siti Rahmawati', 'Budi Santoso', 'Rina Wulandari', 'Agus Prasetyo', 'Dewi Lestari', 'Fajar Nugroho', 'Nadia Putri', 'Rizky Ramadhan', 'Maya Anggraini', 'Dimas Saputra', 'Lina Marlina', 'Andi Wijaya', 'Putri Handayani', 'Hendra Kusuma', 'Yuni Astuti', 'Eko Setiawan', 'Tari Permata', 'Bayu Firmansyah', 'Ayu Kartika', 'Joko Susilo', 'Intan Maharani', 'Reza Pahlevi', 'Wulan Sari', 'Teguh Hidayat'];
+    const roles = ['Coordinator', 'Specialist', 'Analyst', 'Supervisor', 'Associate', 'Developer'];
+    const statuses = ['Active', 'Active', 'Active', 'Active', 'On leave', 'Active', 'Inactive'];
+
+    let employees = names.map((n, i) => ({
+      id: i + 1, name: n, email: n.toLowerCase().replace(/[^a-z ]/g, '').replace(/ /g, '.') + '@company.com',
+      dept: DEPTS[i % DEPTS.length], role: roles[(i * 5) % roles.length], loc: LOCS[(i * 3) % LOCS.length], status: statuses[(i * 3) % statuses.length],
+    }));
+    let nextId = employees.length + 1, page = 1, editingId = null, deletingId = null;
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const initials = (n) => n.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+    const code = (id) => 'HC-' + String(id).padStart(4, '0');
+
+    // Fill selects
+    $('f-dept').innerHTML = '<option value="">All departments</option>' + DEPTS.map((d) => `<option>${d}</option>`).join('');
+    $('f-edept').innerHTML = DEPTS.map((d) => `<option>${d}</option>`).join('');
+    $('f-loc').innerHTML = LOCS.map((d) => `<option>${d}</option>`).join('');
+
+    function filtered() {
+      const q = $('q').value.trim().toLowerCase(), d = $('f-dept').value, s = $('f-status').value;
+      return employees.filter((e) => (!d || e.dept === d) && (!s || e.status === s) &&
+        (!q || [e.name, e.email, code(e.id)].some((v) => v.toLowerCase().includes(q))));
+    }
+
+    function render() {
+      const list = filtered(), pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+      page = Math.min(page, pages);
+      const start = (page - 1) * PER_PAGE, slice = list.slice(start, start + PER_PAGE);
+
+      $('rows').innerHTML = slice.map((e) => `
+        <tr class="hover:bg-slate-50/70">
+          <td class="px-5 py-3"><div class="flex items-center gap-3">
+            <span class="grid size-9 shrink-0 place-items-center rounded-full bg-secondary-soft text-xs font-bold text-primary">${initials(e.name)}</span>
+            <div class="min-w-0"><p class="truncate font-semibold">${esc(e.name)}</p><p class="truncate text-xs text-slate-500">${code(e.id)} &middot; ${esc(e.email)}</p></div></div></td>
+          <td class="px-3 py-3"><p>${esc(e.dept)}</p><p class="text-xs text-slate-500">${esc(e.role)}</p></td>
+          <td class="px-3 py-3 text-slate-600">${esc(e.loc)}</td>
+          <td class="px-3 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLE[e.status]}">${e.status}</span></td>
+          <td class="px-5 py-3"><div class="flex justify-end gap-1">
+            <button data-edit="${e.id}" class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-secondary-soft hover:text-primary" aria-label="Edit ${esc(e.name)}"><iconify-icon icon="lucide:pencil" width="16"></iconify-icon></button>
+            <button data-del="${e.id}" class="grid size-8 place-items-center rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600" aria-label="Delete ${esc(e.name)}"><iconify-icon icon="lucide:trash-2" width="16"></iconify-icon></button>
+          </div></td></tr>`).join('');
+
+      $('empty').hidden = list.length > 0;
+      $('count-label').textContent = `${employees.length} employees in total`;
+      $('range-label').textContent = list.length ? `Showing ${start + 1}-${start + slice.length} of ${list.length}` : 'No results';
+      $('page-label').textContent = `Page ${page} of ${pages}`;
+      $('prev').disabled = page <= 1; $('next').disabled = page >= pages;
+    }
+
+    // Filters and paging
+    ['q', 'f-dept', 'f-status'].forEach((id) => $(id).addEventListener('input', () => { page = 1; render(); }));
+    $('clear-btn').addEventListener('click', () => { $('q').value = ''; $('f-dept').value = ''; $('f-status').value = ''; page = 1; render(); });
+    $('prev').addEventListener('click', () => { page--; render(); });
+    $('next').addEventListener('click', () => { page++; render(); });
+
+    // Toast
+    let toastTimer;
+    function toast(msg) {
+      const t = $('toast'); t.textContent = msg; t.style.opacity = 1;
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.style.opacity = 0), 2500);
+    }
+
+    // Add / edit
+    const dlg = $('emp-dialog'), form = $('emp-form');
+    const fieldErr = (id, msg) => {
+      const p = document.querySelector(`[data-err="${id}"]`); p.textContent = msg || ''; p.classList.toggle('hidden', !msg);
+      $(id).classList.toggle('border-red-400', Boolean(msg));
+    };
+    function openForm(emp) {
+      editingId = emp ? emp.id : null;
+      $('dialog-title').textContent = emp ? 'Edit employee' : 'Add employee';
+      $('f-name').value = emp?.name || ''; $('f-email').value = emp?.email || ''; $('f-role').value = emp?.role || '';
+      $('f-edept').value = emp?.dept || DEPTS[0]; $('f-loc').value = emp?.loc || LOCS[0]; $('f-estatus').value = emp?.status || 'Active';
+      ['f-name', 'f-email', 'f-role'].forEach((id) => fieldErr(id, ''));
+      dlg.showModal(); $('f-name').focus();
+    }
+    $('add-btn').addEventListener('click', () => openForm(null));
+    document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => dlg.close()));
+
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const name = $('f-name').value.trim(), email = $('f-email').value.trim(), role = $('f-role').value.trim();
+      let ok = true;
+      fieldErr('f-name', name ? '' : 'Enter the employee\'s full name.'); if (!name) ok = false;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      fieldErr('f-email', emailOk ? '' : 'Enter a valid email, like name@company.com.'); if (!emailOk) ok = false;
+      fieldErr('f-role', role ? '' : 'Enter a position.'); if (!role) ok = false;
+      if (!ok) return;
+
+      const data = { name, email, role, dept: $('f-edept').value, loc: $('f-loc').value, status: $('f-estatus').value };
+      if (editingId) { Object.assign(employees.find((e) => e.id === editingId), data); toast('Employee saved'); }
+      else { employees.unshift({ id: nextId++, ...data }); page = 1; toast('Employee added'); }
+      dlg.close(); render();
+    });
+
+    // Row actions (event delegation)
+    $('rows').addEventListener('click', (ev) => {
+      const edit = ev.target.closest('[data-edit]'), del = ev.target.closest('[data-del]');
+      if (edit) openForm(employees.find((e) => e.id === Number(edit.dataset.edit)));
+      if (del) {
+        const e = employees.find((x) => x.id === Number(del.dataset.del)); deletingId = e.id;
+        $('del-text').textContent = `${e.name} (${code(e.id)}) will be removed from the employee list. This cannot be undone.`;
+        $('del-dialog').showModal();
+      }
+    });
+    $('del-cancel').addEventListener('click', () => $('del-dialog').close());
+    $('del-confirm').addEventListener('click', () => {
+      employees = employees.filter((e) => e.id !== deletingId);
+      $('del-dialog').close(); toast('Employee deleted'); render();
+    });
+
+    // Mobile sidebar
+    const sidebar = $('sidebar'), scrim = $('scrim');
+    const toggleMenu = (open) => { sidebar.classList.toggle('-translate-x-full', !open); scrim.classList.toggle('hidden', !open); };
+    $('menu-btn').addEventListener('click', () => toggleMenu(true));
+    scrim.addEventListener('click', () => toggleMenu(false));
+
+    render();
+  </script>
+</body>
+</html>
