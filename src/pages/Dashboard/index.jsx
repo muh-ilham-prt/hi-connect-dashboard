@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AttendanceCharts, DepartmentRates, KpiGrid, LatestCheckIns } from './components'
+import { AttendanceCharts, DepartmentRates, KpiGrid, LatestCheckIns } from '@/pages/Dashboard/components'
 
 const TOTAL = 248
 const seeded = (index) => {

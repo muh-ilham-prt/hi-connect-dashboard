@@ -1,6 +1,6 @@
 import { Icon } from '@iconify/react'
-import ProgressBar from '../../../components/ProgressBar'
-import StatusBadge from '../../../components/StatusBadge'
+import ProgressBar from '@/components/ProgressBar'
+import StatusBadge from '@/components/StatusBadge'
 
 export function KpiGrid({ cards }) {
   return (

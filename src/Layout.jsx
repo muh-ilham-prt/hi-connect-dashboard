@@ -1,83 +1,91 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
+import menus from '@/assets/menu.json'
+import { http } from '@/helpers/http'
+import logo from '@/assets/logo-transparent.png'
+function NavItem({ item, onNavigate }) {
+  const linkClass = ({ isActive }) =>
+    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+      isActive ? 'bg-secondary' : 'text-white/75 hover:bg-white/10 hover:text-white'
+    }`
 
-const navItems = [
-  { to: '/dashboard', label: 'Analytics', icon: 'lucide:layout-dashboard' },
-  { to: '/employees', label: 'Employees', icon: 'lucide:users' },
-  { to: '/attendance', label: 'Attendance', icon: 'lucide:calendar-check' },
-  { to: '/leave', label: 'Leave requests', icon: 'lucide:calendar-off' },
-]
+  if (item.disabled) {
+    return (
+      <div
+        aria-disabled="true"
+        className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/40"
+      >
+        <Icon icon={item.icon} width="18" />
+        <span>{item.name}</span>
+        <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/60">
+          Dalam proses
+        </span>
+      </div>
+    )
+  }
 
-const settingsItems = [
-  { to: '/office', label: 'Office', icon: 'lucide:building-2' },
-]
+  if (item.children?.length) {
+    return (
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/75 hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden">
+          <Icon icon={item.icon} width="18" />
+          {item.name}
+          <Icon icon="lucide:chevron-down" width="16" className="ml-auto transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
+          {item.children.map((child) => (
+            <NavLink key={child.id} to={child.url} onClick={onNavigate} className={linkClass}>
+              <Icon icon={child.icon} width="16" />
+              {child.name}
+            </NavLink>
+          ))}
+        </div>
+      </details>
+    )
+  }
+
+  return (
+    <NavLink to={item.url} onClick={onNavigate} className={linkClass}>
+      <Icon icon={item.icon} width="18" />
+      {item.name}
+    </NavLink>
+  )
+}
 
 export default function Layout() {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const logout = () => { localStorage.removeItem('token'); navigate('/') }
+  const closeSidebar = () => setSidebarOpen(false)
+  const logout = async () => {
+    try {
+      await http.get('/auth/logout')
+    } catch {
+      // Clear local auth even if the server cannot revoke the session.
+    }
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login', { replace: true })
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
       {/* Mobile scrim */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-slate-900/40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 z-20 bg-slate-900/40 lg:hidden" onClick={closeSidebar} />
       )}
 
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-primary text-white transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center gap-3 px-6 py-6">
-          <span className="grid size-10 place-items-center rounded-xl bg-white text-primary">
-            <Icon icon="lucide:fingerprint" width="24" height="24" />
-          </span>
+          <img src={logo} alt="Hi-Connect" className="size-10 rounded-xl object-contain bg-white" />
           <span className="text-lg font-extrabold">Hi-Connect</span>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 text-sm font-medium" aria-label="Main">
-          {navItems.map(({ to, label, icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                  isActive ? 'bg-secondary' : 'text-white/75 hover:bg-white/10 hover:text-white'
-                }`
-              }
-            >
-              <Icon icon={icon} width="18" />
-              {label}
-            </NavLink>
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3" aria-label="Main">
+          {menus.map((item) => (
+            <NavItem key={item.id} item={item} onNavigate={closeSidebar} />
           ))}
-
-          <details className="group">
-            <summary className="flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden">
-              <Icon icon="lucide:settings" width="18" />
-              Settings
-              <Icon icon="lucide:chevron-down" width="16" className="ml-auto transition-transform group-open:rotate-180" />
-            </summary>
-            <div className="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
-              {settingsItems.map(({ to, label, icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  onClick={() => setSidebarOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                      isActive ? 'bg-secondary' : 'text-white/75 hover:bg-white/10 hover:text-white'
-                    }`
-                  }
-                >
-                  <Icon icon={icon} width="16" />
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-          </details>
         </nav>
 
         <button
@@ -99,15 +107,6 @@ export default function Layout() {
           >
             <Icon icon="lucide:menu" width="20" />
           </button>
-          <div className="relative hidden max-w-xs flex-1 sm:block">
-            <Icon icon="lucide:search" width="16" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="search"
-              placeholder="Search employees"
-              aria-label="Search employees"
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"
-            />
-          </div>
           <div className="ml-auto flex items-center gap-3">
             <button className="grid size-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Notifications">
               <Icon icon="lucide:bell" width="20" />

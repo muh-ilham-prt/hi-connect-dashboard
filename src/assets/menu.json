@@ -1,0 +1,106 @@
+[
+  {
+    "id": "dashboard",
+    "name": "Analytics",
+    "icon": "lucide:layout-dashboard",
+    "url": "/dashboard",
+    "children": []
+  },
+  {
+    "id": "user",
+    "name": "Manajemen Pengguna",
+    "icon": "lucide:user-cog",
+    "url": null,
+    "children": [
+      {
+        "id": "all-users",
+        "name": "Semua Pengguna",
+        "icon": "lucide:users",
+        "url": "/users"
+      },
+      {
+        "id": "role",
+        "name": "Peran dan Hak Akses",
+        "icon": "lucide:shield-check",
+        "url": "/roles"
+      }
+    ]
+  },
+  {
+    "id": "employees",
+    "name": "Karyawan",
+    "icon": "clarity:employee-solid",
+    "url": null,
+    "children": [
+      {
+        "id": "division",
+        "name": "Daftar Divisi",
+        "icon": "ep:suitcase",
+        "url": "/division"
+      },
+      {
+        "id": "employee-master",
+        "name": "Daftar Karyawan",
+        "icon": "lucide:users",
+        "url": "/employees"
+      }
+    ]
+  },
+  {
+    "id": "attendance",
+    "name": "Absensi",
+    "icon": "lucide:calendar-check",
+    "url": "/attendance",
+    "children": []
+  },
+  {
+    "id": "permit",
+    "name": "Perizinan",
+    "icon": "lucide:calendar-off",
+    "url": null,
+    "children": [
+      {
+        "id": "all-request",
+        "name": "Semua Perizinan",
+        "icon": "fluent-mdl2:message-friend-request",
+        "url": "/permits"
+      },
+      {
+        "id": "permit-type",
+        "name": "Tipe Perizinan",
+        "icon": "codicon:group-by-ref-type",
+        "url": "/permit-type"
+      }
+    ]
+  },
+  {
+    "id": "payroll",
+    "name": "Penggajian",
+    "icon": "lucide:wallet",
+    "url": "/payroll",
+    "children": []
+  },
+  {
+    "id": "office",
+    "name": "Kantor",
+    "icon": "lucide:building-2",
+    "url": "/office",
+    "children": []
+  },
+  {
+    "id": "kasbon",
+    "name": "Kasbon",
+    "icon": "lucide:hand-coins",
+    "url": "/kasbon",
+    "disabled": true,
+    "children": []
+  },
+  {
+    "id": "notification",
+    "name": "Notifikasi",
+    "icon": "lucide:bell",
+    "url": "/notifications",
+    "children": []
+  }
+]
+

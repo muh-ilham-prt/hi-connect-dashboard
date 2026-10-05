@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import { http } from "../../helpers/http";
+import logo from "@/assets/logo-transparent.png";
+import { http } from "@/helpers/http";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function getErrors(email, password) {
   const errors = {};
   const value = email.trim();
-  if (!value) errors.email = "Enter your work email.";
+  if (!value) errors.email = "Masukkan email kerja Anda.";
   else if (!emailPattern.test(value))
-    errors.email = "Enter a valid email, like name@company.com.";
-  if (!password) errors.password = "Enter your password.";
+    errors.email = "Masukkan alamat email yang valid, seperti nama@perusahaan.com.";
+  if (!password) errors.password = "Masukkan kata sandi Anda.";
   return errors;
 }
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(false); // ponytail: unused by backend; keep UI until refresh-token endpoint is ready
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -54,20 +56,23 @@ export default function Login() {
       const data = await http.post("/auth/login", {
         email: email.trim(),
         password,
-        remember,
       });
 
-      navigate(data.redirect || "/dashboard");
-    } catch (err) {
-      if (err.status === 401) {
-        setFormError(
-          "Email or password is incorrect. Check your details and try again.",
-        );
-      } else {
-        setFormError(
-          "We could not reach the server. Check your connection and try again.",
-        );
+      const { token, ...user } = data?.data ?? data;
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
       }
+
+      const from = location.state?.from?.pathname;
+      navigate(from && from !== "/login" ? from : "/dashboard", { replace: true });
+    } catch (err) {
+      let msg = "Kami tidak dapat terhubung ke server. Periksa koneksi Anda dan coba lagi.";
+      if (err.response) {
+        const body = await err.response.clone().json().catch(() => null);
+        msg = body?.errors?.email || body?.message || (err.status === 401 || err.status === 422 ? "Email atau kata sandi salah." : msg);
+      }
+      setFormError(msg);
     } finally {
       setLoading(false);
     }
@@ -85,9 +90,7 @@ export default function Login() {
       <section className="relative flex flex-col justify-between gap-10 overflow-hidden bg-primary px-6 py-8 text-white sm:px-10 lg:px-14 lg:py-12" style={{ backgroundImage: 'radial-gradient(circle at 100% 100%, transparent 0 140px, rgba(66,90,173,.55) 141px 142px, transparent 143px), radial-gradient(circle at 100% 100%, transparent 0 220px, rgba(66,90,173,.45) 221px 222px, transparent 223px), radial-gradient(circle at 100% 100%, transparent 0 300px, rgba(66,90,173,.35) 301px 302px, transparent 303px), radial-gradient(circle at 100% 100%, transparent 0 380px, rgba(66,90,173,.25) 381px 382px, transparent 383px)' }}>
 
         <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-xl bg-white text-primary">
-            <Icon icon="lucide:fingerprint" width="26" height="26" />
-          </span>
+          <img src={logo} alt="Hi-Connect" className="size-11 rounded-xl object-contain bg-white" />
           <span className="text-xl font-extrabold tracking-tight">
             Hi-Connect
           </span>
@@ -95,18 +98,18 @@ export default function Login() {
 
         <div className="max-w-md">
           <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">
-            Every check-in, in one place.
+            Semua absensi, dalam satu tempat.
           </h1>
           <p className="mt-4 text-base leading-relaxed text-white/75">
-            Review attendance, approve leave, and keep every site on schedule
-            from a single dashboard.
+            Pantau kehadiran, setujui izin, dan kelola setiap lokasi
+            dari satu dasbor terpusat.
           </p>
 
           <div className="mt-10 inline-block rounded-2xl border border-white/20 bg-white/10 px-6 py-5 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-sm text-white/75">
               <Icon icon="lucide:clock-3" width="16" height="16" />
               <span>
-                {new Intl.DateTimeFormat("en-GB", {
+                {new Intl.DateTimeFormat("id-ID", {
                   weekday: "long",
                   day: "numeric",
                   month: "long",
@@ -126,23 +129,23 @@ export default function Login() {
               </span>
             </div>
             <p className="mt-1 text-sm text-white/60">
-              {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                Zona waktu: {Intl.DateTimeFormat().resolvedOptions().timeZone}
             </p>
           </div>
         </div>
 
         <p className="hidden text-sm text-white/60 lg:block">
-          &copy; {now.getFullYear()} Hi-Connect. All rights reserved.
+          &copy; {now.getFullYear()} Hi-Connect. Hak cipta dilindungi.
         </p>
       </section>
 
       <section className="flex items-center justify-center px-6 py-12 sm:px-10">
         <div className="w-full max-w-sm">
           <h2 className="text-2xl font-bold text-primary">
-            Sign in to your dashboard
+            Masuk ke dasbor Anda
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            Use your admin or HR account to manage employee attendance.
+            Gunakan akun admin atau HR untuk mengelola kehadiran karyawan.
           </p>
 
           {formError && (
@@ -166,7 +169,7 @@ export default function Login() {
                 htmlFor="email"
                 className="mb-1.5 block text-sm font-semibold text-slate-700"
               >
-                Work email
+                Email kerja
               </label>
               <div className="relative">
                 <Icon
@@ -181,7 +184,7 @@ export default function Login() {
                   type="email"
                   autoComplete="username"
                   required
-                  placeholder="name@company.com"
+                  placeholder="nama@perusahaan.com"
                   value={email}
                   onChange={(event) => updateEmail(event.target.value)}
                   aria-invalid={Boolean(errors.email)}
@@ -201,7 +204,7 @@ export default function Login() {
                 htmlFor="password"
                 className="mb-1.5 block text-sm font-semibold text-slate-700"
               >
-                Password
+                Kata sandi
               </label>
               <div className="relative">
                 <Icon
@@ -216,7 +219,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  placeholder="Enter your password"
+                  placeholder="Masukkan kata sandi Anda"
                   value={password}
                   onChange={(event) => updatePassword(event.target.value)}
                   aria-invalid={Boolean(errors.password)}
@@ -228,7 +231,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((show) => !show)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
                   aria-pressed={showPassword}
                   className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-slate-500 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40"
                 >
@@ -254,14 +257,14 @@ export default function Login() {
                   onChange={(event) => setRemember(event.target.checked)}
                   className="size-4 rounded border-slate-300 accent-secondary"
                 />
-                Keep me signed in
+                Tetap masuk
               </label>
               <a
                 href="#"
                 onClick={(event) => event.preventDefault()}
                 className="font-semibold text-secondary hover:text-primary focus-visible:outline-none focus-visible:underline"
               >
-                Forgot password?
+                Lupa kata sandi?
               </a>
             </div>
 
@@ -278,7 +281,7 @@ export default function Login() {
                   className="animate-spin"
                 />
               )}
-              <span>{loading ? "Signing in..." : "Sign in"}</span>
+              <span>{loading ? "Sedang masuk..." : "Masuk"}</span>
             </button>
           </form>
 
@@ -289,7 +292,7 @@ export default function Login() {
               height="16"
               className="text-secondary"
             />
-            Access is limited to authorized administrators.
+            Akses hanya untuk administrator yang berwenang.
           </p>
         </div>
       </section>
