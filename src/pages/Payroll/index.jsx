@@ -20,7 +20,20 @@ const EMPTY_SUMMARY = {
 
 function readPayrolls(response) {
   const rows = response?.data?.data;
-  return Array.isArray(rows) ? rows : [];
+  if (!Array.isArray(rows)) return [];
+
+  return rows.map((payroll) => ({
+    ...payroll,
+    totalNetPay: payroll.total_net_pay,
+    grossPay: payroll.gros_pay,
+    details: Array.isArray(payroll.details)
+      ? payroll.details.map((detail) => ({
+          ...detail,
+          grossSalary: detail.gross_salary,
+          netSalary: detail.net_salary,
+        }))
+      : [],
+  }));
 }
 
 export default function Payroll() {
