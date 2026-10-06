@@ -68,7 +68,7 @@ function useFilterOptions(endpoint) {
   return { options, loading, search }
 }
 
-export function AttendanceFilter({ query, onQueryChange, employeeId, onEmployeeChange, divisionId, onDivisionChange }) {
+export function AttendanceFilter({ query, onQueryChange, employeeId, onEmployeeChange, divisionId, onDivisionChange, noCheckInOnly, onNoCheckInChange }) {
   const employees = useFilterOptions('/employee')
   const divisions = useFilterOptions('/division')
 
@@ -112,6 +112,15 @@ export function AttendanceFilter({ query, onQueryChange, employeeId, onEmployeeC
         placeholder="Semua divisi"
         loadingText="Memuat divisi..."
       />
+      <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700">
+        <input
+          type="checkbox"
+          checked={noCheckInOnly}
+          onChange={(e) => onNoCheckInChange(e.target.checked)}
+          className="h-4 w-4 accent-primary"
+        />
+        Belum check-in
+      </label>
     </div>
   )
 }
@@ -252,6 +261,12 @@ export function AttendanceDetailModal({ isOpen, onClose, record }) {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Keterlambatan</p>
               <p className={`mt-0.5 font-semibold ${record.late_status ? 'text-amber-600' : 'text-emerald-600'}`}>{record.late_status ? `Terlambat (${record.late_status})` : 'Tepat waktu'}</p>
             </div>
+            {record.late_reason && (
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Alasan keterlambatan</p>
+                <p className="mt-0.5 text-slate-800">{record.late_reason}</p>
+              </div>
+            )}
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Keluar</p>
               <p className="mt-0.5 font-semibold text-slate-800">{record.check_out?.slice(0, 5) ?? 'Masih bekerja'}</p>

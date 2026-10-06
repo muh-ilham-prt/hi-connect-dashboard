@@ -6,8 +6,8 @@ const seeded = (index) => {
   const value = Math.sin(index * 12.9898) * 43758.5453
   return value - Math.floor(value)
 }
-const formatDay = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short' })
-const formatDate = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+const formatDay = new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short' })
+const formatDate = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
 function buildDays(daysCount) {
   const result = []
@@ -68,29 +68,29 @@ export default function Dashboard() {
   const buckets = getBuckets()
 
   const cards = [
-    { label: 'Present', value: present, sub: `${Math.round((present / TOTAL) * 100)}% of ${TOTAL}`, icon: 'lucide:user-check', delta: null },
-    { label: 'Late', value: today.late, icon: 'lucide:alarm-clock', delta: today.late - prev.late },
-    { label: 'Absent', value: today.absent, icon: 'lucide:user-x', delta: today.absent - prev.absent },
-    { label: 'On leave', value: today.leave, icon: 'lucide:tree-palm', delta: today.leave - prev.leave },
+    { label: 'Hadir', value: present, sub: `${Math.round((present / TOTAL) * 100)}% dari ${TOTAL}`, icon: 'lucide:user-check', delta: null },
+    { label: 'Terlambat', value: today.late, icon: 'lucide:alarm-clock', delta: today.late - prev.late },
+    { label: 'Tidak hadir', value: today.absent, icon: 'lucide:user-x', delta: today.absent - prev.absent },
+    { label: 'Cuti', value: today.leave, icon: 'lucide:tree-palm', delta: today.leave - prev.leave },
   ]
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-primary">Attendance analytics</h1>
+          <h1 className="text-2xl font-extrabold text-primary">Analitik absensi</h1>
           <p className="text-sm text-slate-500">{formatDate.format(new Date())}</p>
         </div>
         <label className="text-sm text-slate-600">
-          <span className="sr-only">Date range</span>
+          <span className="sr-only">Rentang tanggal</span>
           <select
             value={range}
             onChange={(event) => setRange(Number(event.target.value))}
             className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"
           >
-            <option value={5}>This week</option>
-            <option value={10}>Last 10 working days</option>
-            <option value={20}>Last 20 working days</option>
+            <option value={5}>Minggu ini</option>
+            <option value={10}>10 hari kerja terakhir</option>
+            <option value={20}>20 hari kerja terakhir</option>
           </select>
         </label>
       </div>

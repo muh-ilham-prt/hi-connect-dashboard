@@ -37,6 +37,7 @@ export default function Attendance() {
   const [query, setQuery] = useState('')
   const [employeeId, setEmployeeId] = useState('')
   const [divisionId, setDivisionId] = useState('')
+  const [noCheckInOnly, setNoCheckInOnly] = useState(false)
   const [page, setPage] = useState(1)
   const [records, setRecords] = useState([])
   const [meta, setMeta] = useState({ page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
@@ -91,6 +92,10 @@ export default function Attendance() {
     setPage(1)
   }
 
+  function handleNoCheckInChange(value) {
+    setNoCheckInOnly(value)
+  }
+
   function handleDateRangeChange(range) {
     setStartDate(range.startDate)
     setEndDate(range.endDate)
@@ -102,9 +107,11 @@ export default function Attendance() {
     setDetailOpen(true)
   }
 
+  const visibleRecords = noCheckInOnly ? records.filter((record) => !record.check_in) : records
+
   function handleExport() {
     const header = ['Karyawan', 'Email', 'Tanggal', 'Masuk', 'Keluar', 'Jarak (m)', 'Latitude', 'Longitude']
-    const rows = records.map((record) => [
+    const rows = visibleRecords.map((record) => [
       record.employee?.name,
       record.employee?.email,
       record.date,
@@ -132,6 +139,7 @@ export default function Attendance() {
     setEndDate('')
     setEmployeeId('')
     setDivisionId('')
+    setNoCheckInOnly(false)
     setPage(1)
   }
 
@@ -154,7 +162,7 @@ export default function Attendance() {
           />
           <button
             onClick={handleExport}
-            disabled={records.length === 0}
+            disabled={visibleRecords.length === 0}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
           >
             <Icon icon="lucide:download" width="18" />
@@ -170,11 +178,13 @@ export default function Attendance() {
         onEmployeeChange={handleEmployeeChange}
         divisionId={divisionId}
         onDivisionChange={handleDivisionChange}
+        noCheckInOnly={noCheckInOnly}
+        onNoCheckInChange={handleNoCheckInChange}
       />
 
       <section className="rounded-xl border border-slate-200 bg-white">
         <AttendanceTable
-          records={records}
+          records={visibleRecords}
           loading={loading}
           onViewDetail={handleViewDetail}
           onClearFilters={clearFilters}

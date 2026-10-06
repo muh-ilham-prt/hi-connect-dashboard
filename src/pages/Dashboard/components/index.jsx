@@ -4,7 +4,7 @@ import StatusBadge from '@/components/StatusBadge'
 
 export function KpiGrid({ cards }) {
   return (
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Today at a glance">
+    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Ringkasan hari ini">
       {cards.map(({ label, value, sub, delta, icon }) => (
         <article key={label} className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between text-sm font-medium text-slate-500">
@@ -22,7 +22,7 @@ export function KpiGrid({ cards }) {
                 <span className={delta > 0 ? 'text-red-600' : 'text-emerald-600'}>
                   {delta > 0 ? '+' : ''}{delta}
                 </span>
-                <span className="text-slate-500"> vs yesterday</span>
+                <span className="text-slate-500"> dibanding kemarin</span>
               </>
             )}
           </p>
@@ -59,12 +59,12 @@ export function AttendanceCharts({ days, buckets, formatDay }) {
 
   return (
     <div className="grid gap-6 xl:grid-cols-5">
-      <ChartCard title="Late and absent per day" className="xl:col-span-3">
+      <ChartCard title="Keterlambatan dan ketidakhadiran per hari" className="xl:col-span-3">
         <div className="mt-2 flex justify-end gap-4 text-xs text-slate-500">
-          <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-sm bg-[#9fb0e3]" />Late</span>
-          <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-sm bg-primary" />Absent</span>
+          <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-sm bg-[#9fb0e3]" />Terlambat</span>
+          <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-sm bg-primary" />Tidak hadir</span>
         </div>
-        <svg viewBox={`0 0 ${width} ${height}`} className="mt-2 h-auto w-full" role="img" aria-label="Grouped bar chart of late and absent employees per day">
+        <svg viewBox={`0 0 ${width} ${height}`} className="mt-2 h-auto w-full" role="img" aria-label="Diagram batang berkelompok karyawan terlambat dan tidak hadir per hari">
           {[0, 1, 2, 3, 4].map((step) => {
             const value = (max / 4) * step
             const y = pad.top + innerHeight - (value / max) * innerHeight
@@ -91,14 +91,14 @@ export function AttendanceCharts({ days, buckets, formatDay }) {
         </svg>
       </ChartCard>
 
-      <ChartCard title="Check-in times today" subtitle="Arrivals in 15-minute groups. Shift starts at 08:00." className="xl:col-span-2">
-        <svg viewBox={`0 0 ${timeWidth} ${timeHeight}`} className="mt-4 h-auto w-full" role="img" aria-label="Histogram of check-in times today">
+      <ChartCard title="Waktu check-in hari ini" subtitle="Kedatangan dalam kelompok 15 menit. Jam kerja dimulai pukul 08.00." className="xl:col-span-2">
+        <svg viewBox={`0 0 ${timeWidth} ${timeHeight}`} className="mt-4 h-auto w-full" role="img" aria-label="Histogram waktu check-in hari ini">
           {buckets.map((bucket, index) => {
             const barHeight = (bucket.value / timeMax) * timeInnerHeight
             const x = timePad.left + timeGroupWidth * index + 3
             return <g key={bucket.label}>
               <rect x={x} y={timePad.top + timeInnerHeight - barHeight} width={timeGroupWidth - 6} height={barHeight} rx="3" fill={bucket.late ? '#9fb0e3' : '#1a2e75'}>
-                <title>{bucket.label}: {bucket.value} check-ins</title>
+                <title>{bucket.label}: {bucket.value} check-in</title>
               </rect>
               {index % 3 === 0 && <text x={x + (timeGroupWidth - 6) / 2} y={timeHeight - 8} textAnchor="middle" fontSize="11" fill="#64748b">{bucket.label}</text>}
             </g>
@@ -114,7 +114,7 @@ export function AttendanceCharts({ days, buckets, formatDay }) {
 export function DepartmentRates({ departments }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 xl:col-span-2">
-      <h2 className="font-bold text-primary">Attendance rate by department</h2>
+      <h2 className="font-bold text-primary">Tingkat kehadiran per divisi</h2>
       <ul className="mt-4 space-y-4">
         {departments.map(([name, rate]) => (
           <li key={name}>
@@ -122,7 +122,7 @@ export function DepartmentRates({ departments }) {
               <span className="font-medium">{name}</span>
               <span className="tabular-nums text-slate-500">{rate}%</span>
             </div>
-            <ProgressBar value={rate} ariaLabel={`${name} attendance ${rate}%`} />
+            <ProgressBar value={rate} ariaLabel={`${name} kehadiran ${rate}%`} />
           </li>
         ))}
       </ul>
@@ -134,16 +134,16 @@ export function LatestCheckIns({ rows }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 xl:col-span-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-bold text-primary">Latest check-ins</h2>
-        <a href="#/attendance" className="text-sm font-semibold text-secondary hover:text-primary">View all attendance</a>
+        <h2 className="font-bold text-primary">Check-in terbaru</h2>
+        <a href="#/attendance" className="text-sm font-semibold text-secondary hover:text-primary">Lihat semua absensi</a>
       </div>
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[480px] text-left text-sm">
           <thead className="text-xs text-slate-500">
             <tr>
-              <th className="py-2 font-semibold">Employee</th>
+              <th className="py-2 font-semibold">Karyawan</th>
               <th className="py-2 font-semibold">Check-in</th>
-              <th className="py-2 font-semibold">Location</th>
+              <th className="py-2 font-semibold">Lokasi</th>
               <th className="py-2 font-semibold">Status</th>
             </tr>
           </thead>
