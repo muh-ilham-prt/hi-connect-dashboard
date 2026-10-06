@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
+  base: '/hi-connect-dashboard/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
