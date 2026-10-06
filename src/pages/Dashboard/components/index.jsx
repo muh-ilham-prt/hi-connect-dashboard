@@ -43,16 +43,18 @@ function ChartCard({ title, subtitle, children, className = '' }) {
 }
 
 export function AttendanceCharts({ days, buckets, formatDay }) {
+  if (!days.length && !buckets.length) return <p className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500">Belum ada data analitik.</p>
+
   const width = 640, height = 240
   const pad = { left: 32, right: 8, top: 12, bottom: 28 }
-  const max = Math.ceil(Math.max(...days.flatMap(({ late, absent }) => [late, absent])) / 8) * 8
+  const max = Math.max(8, Math.ceil(Math.max(0, ...days.flatMap(({ late = 0, absent = 0 }) => [late, absent])) / 8) * 8)
   const innerWidth = width - pad.left - pad.right
   const innerHeight = height - pad.top - pad.bottom
   const groupWidth = innerWidth / days.length
   const barWidth = Math.min(18, groupWidth * 0.32)
   const timeWidth = 400, timeHeight = 240
   const timePad = { left: 8, right: 8, top: 16, bottom: 28 }
-  const timeMax = Math.max(...buckets.map(({ value }) => value))
+  const timeMax = Math.max(1, ...buckets.map(({ value = 0 }) => value))
   const timeInnerHeight = timeHeight - timePad.top - timePad.bottom
   const timeGroupWidth = (timeWidth - timePad.left - timePad.right) / buckets.length
   const markerX = timePad.left + timeGroupWidth * 4

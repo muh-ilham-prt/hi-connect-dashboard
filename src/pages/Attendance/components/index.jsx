@@ -220,12 +220,14 @@ export function AttendanceTable({ records, loading, onViewDetail, onClearFilters
 
 // ---- Attendance detail modal ----
 export function AttendanceDetailModal({ isOpen, onClose, record }) {
+  const lateStatus = typeof record?.late_status === 'string' ? record.late_status.trim() : record?.late_status
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Detail absensi" maxWidth="max-w-lg">
       {record ? (
         <div className="space-y-4">
           {/* Photo */}
-          {record.photo ? (
+          {lateStatus && (record.photo ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {Object.entries(record.photo).map(([type, src]) => (
                 <div key={type} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
@@ -238,7 +240,7 @@ export function AttendanceDetailModal({ isOpen, onClose, record }) {
             <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 py-10 text-slate-400">
               <Icon icon="lucide:image-off" width="32" />
             </div>
-          )}
+          ))}
 
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3 text-sm">
@@ -257,15 +259,19 @@ export function AttendanceDetailModal({ isOpen, onClose, record }) {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Masuk</p>
               <p className="mt-0.5 font-semibold text-slate-800">{record.check_in?.slice(0, 5) ?? '-'}</p>
             </div>
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Keterlambatan</p>
-              <p className={`mt-0.5 font-semibold ${record.late_status ? 'text-amber-600' : 'text-emerald-600'}`}>{record.late_status ? `Terlambat (${record.late_status})` : 'Tepat waktu'}</p>
-            </div>
-            {record.late_reason && (
-              <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Alasan keterlambatan</p>
-                <p className="mt-0.5 text-slate-800">{record.late_reason}</p>
-              </div>
+            {lateStatus && (
+              <>
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Keterlambatan</p>
+                  <p className="mt-0.5 font-semibold text-amber-600">Terlambat ({lateStatus})</p>
+                </div>
+                {record.late_reason && (
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Alasan keterlambatan</p>
+                    <p className="mt-0.5 text-slate-800">{record.late_reason}</p>
+                  </div>
+                )}
+              </>
             )}
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Keluar</p>

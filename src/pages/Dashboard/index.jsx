@@ -1,78 +1,78 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { http } from '@/helpers/http'
 import { AttendanceCharts, DepartmentRates, KpiGrid, LatestCheckIns } from '@/pages/Dashboard/components'
 
-const TOTAL = 248
-const seeded = (index) => {
-  const value = Math.sin(index * 12.9898) * 43758.5453
-  return value - Math.floor(value)
-}
 const formatDay = new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short' })
 const formatDate = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
-function buildDays(daysCount) {
-  const result = []
-  const cursor = new Date()
-  let step = 0
-  while (result.length < daysCount) {
-    if (cursor.getDay() % 6 !== 0) {
-      const key = step++
-      result.unshift({
-        date: new Date(cursor),
-        late: Math.round(12 + seeded(key + 1) * 16),
-        absent: Math.round(5 + seeded(key + 9) * 9),
-        leave: Math.round(4 + seeded(key + 17) * 8),
-      })
-    }
-    cursor.setDate(cursor.getDate() - 1)
-  }
-  return result
+function dateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-function getBuckets() {
-  const result = []
-  for (let index = 0; index < 10; index++) {
-    const minutes = 7 * 60 + index * 15
-    const peak = Math.exp(-Math.pow((index - 3.2) / 1.7, 2))
-    result.push({
-      label: `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`,
-      value: Math.round(peak * 70 + seeded(index + 3) * 8),
-      late: minutes >= 8 * 60,
-    })
+function dateRange(daysCount) {
+  const to = new Date()
+  const cursor = new Date(to)
+  let workingDays = 0
+  while (workingDays < daysCount) {
+    if (cursor.getDay() % 6 !== 0) workingDays += 1
+    if (workingDays < daysCount) cursor.setDate(cursor.getDate() - 1)
   }
-  return result
+  return { from: dateKey(cursor), to: dateKey(to) }
 }
 
-const departments = [
-  ['Operations', 96.4],
-  ['Sales', 94.1],
-  ['Finance', 97.8],
-  ['Engineering', 92.5],
-  ['Customer support', 89.7],
-]
-
-const recentRows = [
-  ['Siti Rahmawati', 'Finance', '07:52', 'Head office', 'On time'],
-  ['Budi Santoso', 'Operations', '07:58', 'Warehouse A', 'On time'],
-  ['Rina Wulandari', 'Sales', '08:14', 'Head office', 'Late'],
-  ['Agus Prasetyo', 'Engineering', '08:02', 'Remote', 'Remote'],
-  ['Dewi Lestari', 'Customer support', '08:21', 'Branch Depok', 'Late'],
-  ['Fajar Nugroho', 'Operations', '07:47', 'Warehouse B', 'On time'],
-]
+const emptySummary = {
+  period: {},
+  summary: { total_employees: 0, present: 0, late: 0, absent: 0, on_leave: 0, attendance_rate: 0 },
+  comparison: { present: 0, late: 0, absent: 0, on_leave: 0 },
+  daily: [],
+  check_in_buckets: [],
+  department_rates: [],
+  latest_check_ins: [],
+}
 
 export default function Dashboard() {
   const [range, setRange] = useState(5)
-  const days = buildDays(range)
-  const today = days[days.length - 1]
-  const prev = days[days.length - 2] || today
-  const present = TOTAL - today.absent - today.leave
-  const buckets = getBuckets()
+  const [dashboard, setDashboard] = useState(emptySummary)
+  const [loading, setLoading] = useState(true)
+  const period = useMemo(() => dateRange(range), [range])
 
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    http.get(`/attendance-summary?from=${period.from}&to=${period.to}&timezone=Asia%2FJakarta`)
+      .then((response) => {
+        if (active) setDashboard({ ...emptySummary, ...(response?.data ?? {}) })
+      })
+      .catch(() => {
+        if (active) setDashboard(emptySummary)
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => { active = false }
+  }, [period])
+
+  const { summary, comparison } = dashboard
   const cards = [
-    { label: 'Hadir', value: present, sub: `${Math.round((present / TOTAL) * 100)}% dari ${TOTAL}`, icon: 'lucide:user-check', delta: null },
-    { label: 'Terlambat', value: today.late, icon: 'lucide:alarm-clock', delta: today.late - prev.late },
-    { label: 'Tidak hadir', value: today.absent, icon: 'lucide:user-x', delta: today.absent - prev.absent },
-    { label: 'Cuti', value: today.leave, icon: 'lucide:tree-palm', delta: today.leave - prev.leave },
+    { label: 'Hadir', value: summary.present, sub: `${summary.attendance_rate}% dari ${summary.total_employees}`, icon: 'lucide:user-check', delta: null },
+    { label: 'Terlambat', value: summary.late, icon: 'lucide:alarm-clock', delta: comparison.late },
+    { label: 'Tidak hadir', value: summary.absent, icon: 'lucide:user-x', delta: comparison.absent },
+    { label: 'Cuti', value: summary.on_leave, icon: 'lucide:tree-palm', delta: comparison.on_leave },
   ]
+  const days = dashboard.daily.map((day) => ({ ...day, date: new Date(`${day.date}T00:00:00`) }))
+  const buckets = dashboard.check_in_buckets.map((bucket) => ({
+    label: bucket.start,
+    value: bucket.count,
+    late: bucket.late,
+  }))
+  const departments = dashboard.department_rates.map((department) => [department.name, department.rate])
+  const rows = dashboard.latest_check_ins.map((checkIn) => [
+    checkIn.employee?.name,
+    checkIn.employee?.department,
+    checkIn.check_in?.slice(0, 5),
+    checkIn.location,
+    checkIn.status,
+  ])
 
   return (
     <div className="space-y-6">
@@ -95,12 +95,16 @@ export default function Dashboard() {
         </label>
       </div>
 
-      <KpiGrid cards={cards} />
-      <AttendanceCharts days={days} buckets={buckets} formatDay={formatDay} />
-      <div className="grid gap-6 xl:grid-cols-5">
-        <DepartmentRates departments={departments} />
-        <LatestCheckIns rows={recentRows} />
-      </div>
+      {loading ? <p className="text-sm text-slate-500">Memuat analitik absensi...</p> : (
+        <>
+          <KpiGrid cards={cards} />
+          <AttendanceCharts days={days} buckets={buckets} formatDay={formatDay} />
+          <div className="grid gap-6 xl:grid-cols-5">
+            <DepartmentRates departments={departments} />
+            <LatestCheckIns rows={rows} />
+          </div>
+        </>
+      )}
     </div>
   )
 }
